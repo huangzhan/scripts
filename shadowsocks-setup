@@ -1,0 +1,24 @@
+#!/bin/sh
+if [ $# != 1 ]; then
+	echo "ONE PASSWORD REQUIRED";
+	exit 1;
+fi
+PASSWORD=$1
+wget -O- http://shadowsocks.org/debian/1D27208A.gpg|apt-key add -
+echo "deb http://shadowsocks.org/ubuntu trusty main" > /etc/apt/sources.list.d/shadowsocks.list
+locale-gen "en_US.UTF-8"
+locale-gen "zh_CN.UTF-8"
+dpkg-reconfigure locales
+apt-get update
+apt-get -y install shadowsocks-libev byobu youtube-dl
+cat >/etc/shadowsocks-libev/config.json <<EOF
+{
+    "server":"0.0.0.0",
+    "server_port":443,
+    "local_port":1080,
+    "password":"$PASSWORD",
+    "timeout":60,
+    "method":"aes-256-cfb"
+}
+EOF
+/etc/init.d/shadowsocks-libev restart
